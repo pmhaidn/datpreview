@@ -3,6 +3,9 @@ import pandas as pd
 import re
 from datetime import datetime
 import base64
+import openpyxl
+from openpyxl.styles import numbers
+import io
 
 # Thiết lập trang
 st.set_page_config(
@@ -344,6 +347,39 @@ def display_mini_stats(title, value, icon="📊"):
     </div>
     """, unsafe_allow_html=True)
 
+def export_to_excel(df, filename):
+    """Xuất DataFrame ra file Excel với định dạng text cho tất cả các ô"""
+    output = io.BytesIO()
+    
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Sheet1')
+        
+        # Lấy worksheet
+        worksheet = writer.sheets['Sheet1']
+        
+        # Đặt định dạng text cho tất cả các cột và điều chỉnh độ rộng
+        for idx, column in enumerate(worksheet.columns):
+            # Lấy tên cột
+            column_letter = openpyxl.utils.get_column_letter(idx + 1)
+            
+            # Tính độ rộng tối đa cần thiết
+            max_length = 0
+            for cell in column:
+                # Đặt định dạng text cho ô
+                cell.number_format = '@'
+                
+                # Tính độ dài của nội dung
+                if cell.value:
+                    # Thêm padding cho tiếng Việt
+                    cell_length = len(str(cell.value)) * 1.2
+                    max_length = max(max_length, cell_length)
+            
+            # Đặt độ rộng cột (thêm padding)
+            adjusted_width = max_length + 2
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+    
+    return output.getvalue()
+
 def main():
     # Thêm CSS tùy chỉnh
     add_custom_css()
@@ -356,7 +392,7 @@ def main():
         st.markdown("""
         1. Tải lên file DAT của bạn
         2. Xem dữ liệu được phân tích tự động
-        3. Tải xuống kết quả phân tích dưới dạng CSV
+        3. Tải xuống kết quả phân tích dưới dạng XLSX
         """)
         st.markdown("---")
         st.markdown("### Thông tin")
@@ -443,14 +479,8 @@ def main():
         
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Tạo nút download CSV (một nút duy nhất với menu)
+        # Tạo nút download Excel
         st.markdown("### 💾 Tải xuống dữ liệu")
-        
-        # Chuẩn bị dữ liệu CSV
-        csv_all = df.to_csv(index=False)
-        csv_header = header_df.to_csv(index=False)
-        csv_detail = detail_df.to_csv(index=False)
-        csv_trailer = trailer_df.to_csv(index=False)
         
         # Chọn loại dữ liệu để tải xuống
         download_type = st.selectbox(
@@ -460,25 +490,25 @@ def main():
         
         # Sử dụng download_type để quyết định data nào sẽ được tải xuống
         if download_type == "Tất cả bản ghi":
-            file_data = csv_all
-            file_name = 'dat_analysis_all.csv'
+            file_data = export_to_excel(df, 'dat_analysis_all.xlsx')
+            file_name = 'dat_analysis_all.xlsx'
         elif download_type == "Bản ghi tiêu đề":
-            file_data = csv_header
-            file_name = 'dat_header.csv'
+            file_data = export_to_excel(header_df, 'dat_header.xlsx')
+            file_name = 'dat_header.xlsx'
         elif download_type == "Bản ghi chi tiết":
-            file_data = csv_detail
-            file_name = 'dat_detail.csv'
+            file_data = export_to_excel(detail_df, 'dat_detail.xlsx')
+            file_name = 'dat_detail.xlsx'
         else:  # Bản ghi tổng kết
-            file_data = csv_trailer
-            file_name = 'dat_trailer.csv'
+            file_data = export_to_excel(trailer_df, 'dat_trailer.xlsx')
+            file_name = 'dat_trailer.xlsx'
         
         # Tạo nút download
         st.markdown('<div class="custom-download-btn">', unsafe_allow_html=True)
         st.download_button(
-            label=f"📥 Tải xuống CSV",
+            label=f"📥 Tải xuống Excel",
             data=file_data,
             file_name=file_name,
-            mime='text/csv',
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         )
         st.markdown('</div>', unsafe_allow_html=True)
             
