@@ -14,6 +14,10 @@ st.set_page_config(
 
 # Thêm CSS tùy chỉnh
 def add_custom_css():
+    # Kiểm tra xem theme đang dùng là gì
+    is_dark_theme = st.get_option("theme.base") == "dark"
+    
+    # CSS chung
     st.markdown("""
     <style>
     .main .block-container {
@@ -22,7 +26,7 @@ def add_custom_css():
     }
     
     h1, h2, h3 {
-        color: #1E88E5;
+        color: #1E88E5 !important;
     }
     
     h1 {
@@ -47,19 +51,19 @@ def add_custom_css():
     .stTabs [data-baseweb="tab"] {
         height: 3rem;
         white-space: pre-wrap;
-        background-color: #F0F2F6;
+        background-color: rgba(240, 242, 246, 0.1);
         border-radius: 5px 5px 0px 0px;
         padding: 0.5rem 1rem;
         font-weight: 500;
     }
     
     .stTabs [aria-selected="true"] {
-        background-color: #1E88E5;
-        color: white;
+        background-color: #1E88E5 !important;
+        color: white !important;
     }
     
     .stDataFrame {
-        border: 1px solid #E0E0E0;
+        border: 1px solid rgba(224, 224, 224, 0.2) !important;
         border-radius: 5px;
     }
     
@@ -78,7 +82,7 @@ def add_custom_css():
     }
     
     .mini-statistic-box {
-        background-color: #f8f9fa;
+        background-color: rgba(248, 249, 250, 0.05);
         border-radius: 4px;
         padding: 0.5rem;
         margin-bottom: 0.5rem;
@@ -94,7 +98,6 @@ def add_custom_css():
     }
     
     .data-preview {
-        background-color: #f8f9fa;
         border-radius: 5px;
         padding: 0.5rem;
         margin-bottom: 0.5rem;
@@ -102,22 +105,19 @@ def add_custom_css():
         overflow-y: auto;
         font-family: monospace;
         font-size: 0.8rem;
-        border: 1px solid #ddd;
     }
     
     .upload-container {
-        background-color: white;
         padding: 1rem;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         margin-bottom: 1rem;
     }
     
     .preview-container {
-        background-color: white;
         padding: 0.8rem;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         margin-bottom: 1rem;
     }
     
@@ -125,7 +125,6 @@ def add_custom_css():
         font-size: 1rem;
         font-weight: 500;
         margin-bottom: 0.5rem;
-        color: #424242;
     }
     
     .compact-table {
@@ -133,21 +132,17 @@ def add_custom_css():
     }
     
     .stExpander {
-        border: 1px solid #eee;
         border-radius: 5px;
         margin-bottom: 1rem;
     }
     
-    /* Định dạng nút download */
     .download-area {
-        background-color: white;
         padding: 1rem;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         margin-top: 1rem;
     }
     
-    /* Định dạng tabs */
     .data-tabs {
         margin-top: 1rem;
     }
@@ -157,19 +152,17 @@ def add_custom_css():
         display: none;
     }
     
-    /* Tùy chỉnh màu sắc cho selectbox */
     div[data-testid="stSelectbox"] {
         max-width: 300px;
     }
     
     div[data-testid="stDownloadButton"] {
-        margin: 0 auto;
         display: block;
     }
     
     div[data-testid="stDownloadButton"] button {
         background-color: #4CAF50;
-        color: white;
+        color: white !important;
         padding: 0.5rem 1rem;
         font-weight: 500;
         border-radius: 5px;
@@ -179,10 +172,70 @@ def add_custom_css():
     
     div[data-testid="stDownloadButton"] button:hover {
         background-color: #45a049;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
-    </style>
     """, unsafe_allow_html=True)
+    
+    # CSS dành riêng cho dark mode
+    if is_dark_theme:
+        st.markdown("""
+        <style>
+        .data-preview {
+            background-color: rgba(49, 51, 63, 0.6) !important;
+            border: 1px solid rgba(150, 150, 150, 0.2);
+            color: rgba(250, 250, 250, 0.95) !important;
+        }
+        
+        .upload-container, .download-area, .preview-container {
+            background-color: rgba(49, 51, 63, 0.4) !important;
+        }
+        
+        .preview-title, .mini-statistic-box, .mini-statistic-box p {
+            color: rgba(250, 250, 250, 0.95) !important;
+        }
+        
+        .stExpander {
+            border: 1px solid rgba(80, 80, 80, 0.2);
+        }
+        
+        div[data-testid="stText"] p,
+        div[data-testid="stMarkdown"] p,
+        .stMarkdown, 
+        .stMarkdown div {
+            color: rgba(250, 250, 250, 0.95) !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+    # CSS dành riêng cho light mode
+    else:
+        st.markdown("""
+        <style>
+        .data-preview {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            color: #333 !important;
+        }
+        
+        .upload-container, .download-area, .preview-container {
+            background-color: white;
+        }
+        
+        .preview-title, .mini-statistic-box, .mini-statistic-box p {
+            color: #333 !important;
+        }
+        
+        .stExpander {
+            border: 1px solid #eee;
+        }
+        
+        div[data-testid="stText"] p,
+        div[data-testid="stMarkdown"] p,
+        .stMarkdown, 
+        .stMarkdown div {
+            color: #333 !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
 # Định nghĩa mapping cho các trường (chỉ giữ tiếng Việt)
 FIELD_MAPPINGS = {
@@ -313,7 +366,6 @@ def main():
     st.title("📊 Phân tích File DAT")
     
     # Khu vực upload file trong container đẹp hơn
-    st.markdown('<div class="upload-container">', unsafe_allow_html=True)
     col1, col2 = st.columns([2, 3])
     
     with col1:
@@ -326,7 +378,6 @@ def main():
             st.markdown(f'<div class="data-preview">{content}</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="data-preview">Chưa có dữ liệu, vui lòng tải file lên.</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
     
     # Hiển thị bảng định nghĩa gọn gàng ở phía dưới upload
     if uploaded_file is not None:
@@ -393,7 +444,6 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Tạo nút download CSV (một nút duy nhất với menu)
-        st.markdown('<div class="download-area">', unsafe_allow_html=True)
         st.markdown("### 💾 Tải xuống dữ liệu")
         
         # Chuẩn bị dữ liệu CSV
@@ -432,7 +482,6 @@ def main():
         )
         st.markdown('</div>', unsafe_allow_html=True)
             
-        st.markdown('</div>', unsafe_allow_html=True)
         
     else:
         # Hiển thị hộp thông tin khi chưa có file
